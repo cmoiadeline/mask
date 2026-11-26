@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Same Mask, Three Truths</title>
+<meta name="description" content="One opera mask. Three tables. How much is it worth?">
+<meta name="theme-color" content="#111111">
+<style>
+:root{
+  --ink:#111; --paper:#f4f0e6; --gold:#d4a84b; --red:#d52b2b;
+  --serif: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ -webkit-text-size-adjust:100%; }
+body{ background:var(--paper); color:var(--ink); font-family:var(--sans); line-height:1.55; }
+body.locked{ overflow:hidden; height:100vh; }
+
+/* ---------- INTRO ---------- */
+#intro{
+  position:fixed; inset:0; z-index:50; overflow:hidden;
+  background:#000; color:#fff;
+  transition:background 1s ease, transform .9s cubic-bezier(.7,0,.2,1);
+}
+#intro.done{ transform:translateY(-100%); pointer-events:none; }
+#intro[data-s="1"]{ background:#000; }
+#intro[data-s="2"]{ background:#fff; color:#111; }
+#intro[data-s="3"]{ background:var(--red); color:#fff; }
+#intro[data-s="4"],#intro[data-s="5"],#intro[data-s="6"]{ background:#111; color:#fff; }
+
+.glow{ position:absolute; inset:0; opacity:0; transition:opacity 1.2s ease;
+  background:radial-gradient(ellipse 60% 52% at 50% 46%, rgba(255,196,92,.55) 0%, rgba(255,170,60,.16) 50%, rgba(0,0,0,0) 74%); }
+#intro[data-s="1"] .glow{ opacity:1; }
+
+.stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;
+  transition:opacity .8s ease, transform .8s ease; }
+#intro[data-s="4"] .stage,#intro[data-s="5"] .stage,#intro[data-s="6"] .stage{ opacity:0; transform:scale(.9); }
+
+.mask{ width:min(54vw,260px); height:auto; overflow:visible;
+  --face:#1a1a1a; --line:var(--gold); --accent:var(--gold); --brow:var(--gold); --eye:var(--gold);
+  transition:transform 1.2s ease; }
+.mask *{ transition:fill .9s ease, stroke .9s ease; }
+#intro[data-s="1"] .mask{ transform:scale(1.04); }
+#intro[data-s="2"] .mask{ --face:#fff; --line:#111; --accent:#fff; --brow:none; --eye:#fff; }
+#intro[data-s="3"] .mask{ --face:#f6f1e6; --line:#111; --accent:#f2b705; --brow:#111; --eye:#111; }
+
+.tag{ margin-top:22px; padding:10px 14px; background:#fff; color:#111; font-family:var(--serif);
+  transform:rotate(-3deg) translateY(12px); opacity:0; transition:opacity .6s ease .5s, transform .6s ease .5s;
+  box-shadow:0 2px 8px rgba(0,0,0,.3); text-align:center; line-height:1.25; }
+.tag b{ display:block; font-size:22px; }
+.tag span{ font-size:12px; letter-spacing:.04em; }
+#intro[data-s="3"] .tag{ opacity:1; transform:rotate(-3deg) translateY(0); }
+
+.cap{ position:absolute; left:0; right:0; bottom:16%; text-align:center; font-size:11px; letter-spacing:.28em;
+  text-transform:uppercase; font-weight:600; padding:0 24px; transition:opacity .5s ease; min-height:1.5em; }
+
+.tri{ position:absolute; inset:0; display:flex; opacity:0; transition:opacity .9s ease; pointer-events:none; }
+#intro[data-s="4"] .tri{ opacity:1; }
+#intro[data-s="5"] .tri,#intro[data-s="6"] .tri{ opacity:.25; }
+.tri > div{ flex:1; display:flex; align-items:center; justify-content:center; }
+.tri .a{ background:#111; } .tri .b{ background:#fff; } .tri .c{ background:var(--red); }
+.tri .mask{ width:min(26vw,120px); }
+.tri .a .mask{ --face:#1a1a1a; --line:var(--gold); --accent:var(--gold); --brow:var(--gold); --eye:var(--gold); }
+.tri .b .mask{ --face:#fff; --line:#111; --accent:#fff; --brow:none; --eye:#fff; }
+.tri .c .mask{ --face:#f6f1e6; --line:#111; --accent:#f2b705; --brow:#111; --eye:#111; }
+
+.title{ position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); text-align:center; padding:0 20px;
+  opacity:0; transition:opacity .8s ease; pointer-events:none; }
+.title h1{ font-family:var(--serif); font-size:clamp(34px,10vw,64px); line-height:1.05; text-shadow:0 2px 18px rgba(0,0,0,.65); }
+.title h1 i{ font-weight:400; }
+.title p{ margin-top:14px; font-family:var(--serif); font-style:italic; font-size:clamp(18px,5vw,26px); text-shadow:0 2px 14px rgba(0,0,0,.7); }
+#intro[data-s="5"] .title.t5{ opacity:1; }
+#intro[data-s="6"] .title.t6{ opacity:1; }
+#intro[data-s="6"] .title.t5{ opacity:0; }
+
+.skip{ position:absolute; right:16px; top:calc(14px + env(safe-area-inset-top)); z-index:3;
+  font:600 11px var(--sans); letter-spacing:.18em; text-transform:uppercase; color:inherit; background:rgba(128,128,128,.25);
+  border:1px solid currentColor; border-radius:999px; padding:9px 14px; cursor:pointer; }
+.bar{ position:absolute; left:0; bottom:0; height:3px; background:currentColor; opacity:.7; width:0; }
+
+/* ---------- CONTENT ---------- */
+main{ max-width:640px; margin:0 auto; padding:0 22px 90px; }
+.kicker{ font-size:11px; letter-spacing:.24em; text-transform:uppercase; font-weight:600; margin-bottom:10px; }
+section{ padding:56px 0 8px; }
+h2{ font-family:var(--serif); font-size:clamp(28px,7.5vw,40px); line-height:1.1; margin-bottom:16px; }
+p{ margin-bottom:14px; font-size:17px; }
+.lead{ font-family:var(--serif); font-size:clamp(22px,6vw,28px); line-height:1.3; }
+.hero{ padding-top:64px; }
+.hero .big{ font-family:var(--serif); font-size:clamp(40px,12vw,68px); line-height:1.02; }
+.hero .big i{ font-weight:400; }
+hr.rule{ border:0; border-top:2px solid var(--ink); margin:38px 0 0; }
+
+.cards{ display:grid; gap:14px; margin-top:20px; }
+.card{ padding:20px 20px 18px; border-radius:2px; }
+.card h3{ font-family:var(--serif); font-size:24px; margin-bottom:6px; }
+.card dl{ display:grid; grid-template-columns:86px 1fr; row-gap:5px; font-size:14px; margin-top:10px; }
+.card dt{ font-size:10px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; padding-top:3px; opacity:.8; }
+.card.sacred{ background:#111; color:#eee; } .card.sacred h3{ color:var(--gold); }
+.card.specimen{ background:#fff; border:1px solid #111; }
+.card.souvenir{ background:var(--red); color:#fff; }
+
+.layers{ list-style:none; counter-reset:l; margin-top:18px; }
+.layers li{ counter-increment:l; display:flex; gap:16px; padding:18px 0; border-top:1px solid #111; }
+.layers li:last-child{ border-bottom:1px solid #111; }
+.layers li:before{ content:counter(l); font-family:var(--serif); font-size:34px; line-height:1; width:24px; flex:none; }
+.layers b{ display:block; font-size:12px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:3px; }
+.layers span{ font-size:16px; }
+
+.vote{ margin-top:22px; background:#111; color:#fff; padding:28px 22px; }
+.vote h2{ color:var(--gold); }
+.vote ul{ margin:0 0 20px 18px; font-size:16px; }
+.btn{ display:inline-block; background:var(--gold); color:#111; text-decoration:none; font-weight:700; letter-spacing:.06em;
+  padding:14px 22px; border-radius:2px; font-size:15px; }
+.btn.off{ background:#444; color:#bbb; pointer-events:none; }
+.btn.ghost{ background:transparent; color:inherit; border:1.5px solid currentColor; }
+.links{ display:flex; flex-wrap:wrap; gap:12px; margin-top:6px; }
+
+.kw{ margin-top:30px; font-size:14px; }
+.kw b{ display:block; font-size:10px; letter-spacing:.22em; text-transform:uppercase; margin-bottom:4px; }
+footer{ margin-top:46px; padding-top:18px; border-top:2px solid #111; font-size:13px; }
+footer em{ display:block; margin-top:10px; font-size:12px; opacity:.8; }
+
+.replay{ position:fixed; right:14px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:20;
+  font:600 11px var(--sans); letter-spacing:.16em; text-transform:uppercase; color:#fff; background:#111;
+  border:0; border-radius:999px; padding:11px 16px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,.35); }
+
+.reveal{ opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease; }
+.reveal.in{ opacity:1; transform:none; }
+
+@media (prefers-reduced-motion: reduce){
+  #intro{ display:none; }
+  .reveal{ opacity:1; transform:none; transition:none; }
+}
+</style>
+</head>
+<body class="locked">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="m" viewBox="0 0 120 160">
+    <path d="M60 4 C 98 4 116 40 114 84 C 112 124 88 156 60 156 C 32 156 8 124 6 84 C 4 40 22 4 60 4 Z" fill="var(--face)" stroke="var(--line)" stroke-width="3"/>
+    <path d="M60 18 L68 34 L60 50 L52 34 Z" fill="var(--accent)" stroke="var(--line)" stroke-width="2"/>
+    <path d="M18 62 C 28 44 46 46 54 58 C 44 54 30 54 18 62 Z" fill="var(--brow)" stroke="var(--line)" stroke-width="2"/>
+    <path d="M102 62 C 92 44 74 46 66 58 C 76 54 90 54 102 62 Z" fill="var(--brow)" stroke="var(--line)" stroke-width="2"/>
+    <ellipse cx="38" cy="76" rx="9" ry="5" fill="none" stroke="var(--eye)" stroke-width="2.5"/>
+    <ellipse cx="82" cy="76" rx="9" ry="5" fill="none" stroke="var(--eye)" stroke-width="2.5"/>
+    <path d="M60 60 L60 100" stroke="var(--line)" stroke-width="2.5" fill="none"/>
+    <circle cx="26" cy="102" r="6" fill="var(--accent)" stroke="var(--line)" stroke-width="2"/>
+    <circle cx="94" cy="102" r="6" fill="var(--accent)" stroke="var(--line)" stroke-width="2"/>
+    <path d="M40 120 C 52 132 68 132 80 120" stroke="var(--line)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </symbol>
+</svg>
+
+<div id="intro" data-s="0" role="img" aria-label="Animation: one opera mask shown on a black, a white and a red table">
+  <div class="glow"></div>
+  <div class="stage">
+    <svg class="mask" viewBox="0 0 120 160"><use href="#m"/></svg>
+    <div class="tag"><b>¥15</b><span>3 for ¥40 · great gift!</span></div>
+  </div>
+  <div class="cap" id="cap"></div>
+  <div class="tri">
+    <div class="a"><svg class="mask" viewBox="0 0 120 160"><use href="#m"/></svg></div>
+    <div class="b"><svg class="mask" viewBox="0 0 120 160"><use href="#m"/></svg></div>
+    <div class="c"><svg class="mask" viewBox="0 0 120 160"><use href="#m"/></svg></div>
+  </div>
+  <div class="title t5"><h1>Same mask.<br><i>Three truths.</i></h1></div>
+  <div class="title t6"><p>How much is it worth?</p></div>
+  <button class="skip" id="skip" type="button">Skip</button>
+  <div class="bar" id="bar"></div>
+</div>
+
+<main id="top">
+  <section class="hero reveal">
+    <div class="kicker">An experiment in display</div>
+    <div class="big">Same Mask,<br><i>Three</i> Truths</div>
+    <hr class="rule">
+  </section>
+
+  <section class="reveal">
+    <p class="lead">Value isn’t in the object. It’s in the arrangement around it.</p>
+    <p>Three tables. One mask. The light, the height, the cloth and the label change. The mask does not.</p>
+  </section>
+
+  <section class="reveal">
+    <div class="kicker">What changed, what didn’t</div>
+    <h2>Three tables</h2>
+    <div class="cards">
+      <div class="card sacred">
+        <h3>The Sacred</h3>
+        <p style="font-size:15px;margin:0">Stand behind the line. Look from where you are.</p>
+        <dl><dt>Light</dt><dd>One warm spotlight</dd><dt>Height</dt><dd>Eye level, raised</dd><dt>Ground</dt><dd>Black cloth</dd><dt>Distance</dt><dd>50 cm, no crossing</dd><dt>Label</dt><dd>Three lines, gold on black</dd></dl>
+      </div>
+      <div class="card specimen">
+        <h3>The Specimen</h3>
+        <p style="font-size:15px;margin:0">Lean in. Read the label. Find the number.</p>
+        <dl><dt>Light</dt><dd>Even white</dd><dt>Height</dt><dd>Table</dd><dt>Ground</dt><dd>White cloth</dd><dt>Distance</dt><dd>30 cm</dd><dt>Label</dt><dd>Catalogue entry</dd></dl>
+      </div>
+      <div class="card souvenir">
+        <h3>The Souvenir</h3>
+        <p style="font-size:15px;margin:0">Pick it up. Check the price.</p>
+        <dl><dt>Light</dt><dd>Room light</dd><dt>Height</dt><dd>Low basket</dd><dt>Ground</dt><dd>Red cloth, small objects</dd><dt>Distance</dt><dd>Touchable</dd><dt>Label</dt><dd>Price tag</dd></dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="kicker">The idea</div>
+    <h2>Three layers</h2>
+    <ol class="layers">
+      <li><div><b>Feel it</b><span>You don’t need a theory. Walk the three tables and notice that the same mask feels different.</span></div></li>
+      <li><div><b>Who decides what it’s worth?</b><span>Sacred, specimen, souvenir. None of these values came with the mask. They were arranged around it.</span></div></li>
+      <li><div><b>You were framed too</b><span>You walked into a class exhibition. We, the curators, framed you the way the tables framed the mask.</span></div></li>
+    </ol>
+  </section>
+
+  <section class="reveal">
+    <div class="vote">
+      <div class="kicker">Your turn</div>
+      <h2>How much is it worth?</h2>
+      <ul>
+        <li>Which table would you save from a fire?</li>
+        <li>Guess the price we paid.</li>
+        <li>One line: what did you feel?</li>
+      </ul>
+      <div class="links">
+        <a id="voteBtn" class="btn off" href="#">Voting opens at the exhibition</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="kicker">More</div>
+    <h2>The thinking behind it</h2>
+    <p>Display, lighting, distance, labels and context are the tools of a museum. Here they are the whole exhibition.</p>
+    <div class="links">
+      <a class="btn ghost" href="https://verdant-castanet-002.notion.site/mask">Design notes</a>
+    </div>
+    <div class="kw"><b>Keywords</b>Museum effect · Provenance · Context · Display</div>
+    <footer>
+      <strong>Ma Shanshan</strong><br>
+      Cultural Heritage + Museum Exhibition<br>
+      Silk Road University, Samarkand · November 2026
+      <em>Labels in this exhibition are part of the experiment. They are not historical records.</em>
+    </footer>
+  </section>
+</main>
+
+<button class="replay" id="replay" type="button" aria-label="Replay the opening animation">↻ Replay</button>
+
+<script>
+(function(){
+  // Paste the Google Form link here when it exists. Until then the vote button stays off.
+  var VOTE_URL = "";
+
+  var intro = document.getElementById('intro');
+  var cap = document.getElementById('cap');
+  var bar = document.getElementById('bar');
+  var skip = document.getElementById('skip');
+  var replay = document.getElementById('replay');
+  var timers = [];
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var vb = document.getElementById('voteBtn');
+  if (VOTE_URL){ vb.href = VOTE_URL; vb.textContent = 'Vote now'; vb.classList.remove('off'); }
+
+  function at(ms, fn){ timers.push(setTimeout(fn, ms)); }
+  function clearAll(){ timers.forEach(clearTimeout); timers = []; }
+  function scene(n, text){
+    intro.setAttribute('data-s', n);
+    cap.style.opacity = 0;
+    setTimeout(function(){ cap.textContent = text || ''; cap.style.opacity = text ? 1 : 0; }, 250);
+  }
+
+  var TOTAL = 10500;
+  function play(){
+    clearAll();
+    window.scrollTo(0,0);
+    document.body.classList.add('locked');
+    intro.classList.remove('done');
+    intro.style.display = '';
+    bar.style.transition = 'none'; bar.style.width = '0';
+    void bar.offsetWidth;
+    bar.style.transition = 'width ' + TOTAL + 'ms linear'; bar.style.width = '100%';
+    scene(0, '');
+    at(200,  function(){ scene(1, 'The Sacred'); });
+    at(2700, function(){ scene(2, 'The Specimen · No. 002'); });
+    at(5000, function(){ scene(3, 'The Souvenir'); });
+    at(7300, function(){ scene(4, ''); });
+    at(8000, function(){ scene(5, ''); });
+    at(9600, function(){ scene(6, ''); });
+    at(TOTAL, finish);
+  }
+  function finish(){
+    clearAll();
+    intro.classList.add('done');
+    document.body.classList.remove('locked');
+    window.scrollTo(0,0);
+    revealCheck();
+  }
+
+  skip.addEventListener('click', finish);
+  replay.addEventListener('click', play);
+
+  var io = ('IntersectionObserver' in window) ? new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:.12}) : null;
+  var items = document.querySelectorAll('.reveal');
+  function revealCheck(){
+    items.forEach(function(el){ if(io){ io.observe(el); } else { el.classList.add('in'); } });
+  }
+
+  var dbg = location.hash.match(/scene(\d)/);
+  if (dbg){ intro.style.transition='none'; scene(+dbg[1], ['','The Sacred','The Specimen · No. 002','The Souvenir','','',''][+dbg[1]]); return; }
+  if (reduce){ document.body.classList.remove('locked'); items.forEach(function(el){ el.classList.add('in'); }); }
+  else { play(); }
+})();
+</script>
+</body>
+</html>
